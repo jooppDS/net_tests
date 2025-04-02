@@ -131,11 +131,15 @@ public class EmpDeptSalgradeTests
     [Fact]
     public void ShouldCalculateAverageSalaryPerDept()
     {
-        var emps = Database.GetEmps();
+         var emps = Database.GetEmps();
 
-        // var result = null; 
-        //
-        // Assert.Contains(result, r => r.DeptNo == 30 && r.AvgSal > 1000);
+         var result = emps.GroupBy(e => e.DeptNo).Select(g => new
+         {
+             DeptNo = g.Key,
+             AvgSal = g.Average(e => e.Sal)
+         });
+        
+         Assert.Contains(result, r => r.DeptNo == 30 && r.AvgSal > 1000);
     }
 
     // 10. Complex filter with subquery and join
@@ -145,8 +149,10 @@ public class EmpDeptSalgradeTests
     {
         var emps = Database.GetEmps();
 
-        // var result = null; 
-        //
-        // Assert.Contains("ALLEN", result);
+         var result = from e in emps where e.Sal > 
+                                           (from e2 in emps where e2.DeptNo == e.DeptNo select e2.Sal).Average()
+                                            select e.EName; 
+        
+         Assert.Contains("ALLEN", result);
     }
 }
